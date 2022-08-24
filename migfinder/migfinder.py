@@ -58,7 +58,11 @@ def hattci(fastafile, output_directory, both=True, nseq=1000, nthread=6):
 		params.insert(1, "-b")
 	
 	out_f=open(output_file_log, "w")
-	subprocess.run(params, stdout=out_f)
+	try:
+		subprocess.run(params, stdout=out_f, shell=True, check=True)
+	except subprocess.CalledProcessError as err:
+		print(err)
+		sys.exit(1)
 
 	#--------------#
 	# parsing file
@@ -74,9 +78,9 @@ def hattci(fastafile, output_directory, both=True, nseq=1000, nthread=6):
 				break
 			else:
 				file_out.write(line)
-	os.unlink(output_file_tmp)
+	#os.unlink(output_file_tmp)
 	# TODO: it is possible that outHattCI.fasta will be written in the base dir
-	shutil.move(f"./outHattCI.fasta", f"{output_file}_hattci.fasta")
+	shutil.copy(f"outHattCI.fasta", f"{output_file}_hattci.fasta")
 	
 	return f"{output_file}_hattci.fasta"
 
@@ -106,7 +110,11 @@ def infernal(fastafile, output_directory, cm_model):
 		fastafile
 	]
 	# calling infernal
-	subprocess.run(params)
+	try:
+		subprocess.run(params, shell=True, check=True)
+	except subprocess.CalledProcessError as err:
+		print(err)
+		sys.exit(1)
 
 	#--------------#
 	# parsing file
@@ -125,7 +133,7 @@ def infernal(fastafile, output_directory, cm_model):
 				fileout.write(line)
 			elif "Hit alignments" in line:
 				break
-	os.unlink(output_file_tmp)
+	#os.unlink(output_file_tmp)
 
 #---------------------------------------------------------------------------#
 
@@ -397,7 +405,11 @@ def prodigal(fastafile, output_directory):
 		"-c"
 	]
 	# calling prodigal
-	subprocess.run(params)
+	try:
+		subprocess.run(params, shell=True, check=True)
+	except subprocess.CalledProcessError as err:
+		print(err)
+		sys.exit(1)
 
 	# Parsing the gff output file to extract CDS	
 	output_orf_gff = f"{output_file}_orf.gff"
@@ -985,17 +997,26 @@ def migfinder_cli():
 	parser.add_argument("-f", "--fasta", required=True, help="Input fasta file. Valid extensions are .fasta, .fna, and .fa")
 	parser.add_argument("-o", "--output", required=True, help="Output directory")	
 	parser.add_argument("-c", "--cmmodel", required=False, help="Covariance model used by Infernal to validate the attC site secondary structure [default=None]")
-	parser.add_argument("-b", "--strand", required=False, help="Perform HattCI in both strands [default=True]")
-	parser.add_argument("-n", "--seqs", required=False, help="Number of sequences processed at a time by HattCI [default=1000]")
-	parser.add_argument("-t", "--threads", required=False, help="Number of threads to run HattCI, [default=6]")	
-	parser.add_argument("-e", "--score", required=False, help="Threshold used to filter Infernal results [default=20]")
-	parser.add_argument("-r", "--orf", required=False, help="Threshold used to filter HattCI results [default=0]")
-	parser.add_argument("-a", "--adist", required=False, help="Max distance allowed to consider two adjacent attC sites part of the same integron [default=4000]")	
-	parser.add_argument("-d", "--odist", required=False, help="Max distance allowed between ORF and attC site in the same gene cassette [default=500]")
+	parser.add_argument("-b", "--strand", required=False, help="Perform HattCI in both strands [default=True]", choices=[True, False], default=True)
+	parser.add_argument("-n", "--seqs", required=False, help="Number of sequences processed at a time by HattCI [default=1000]", type=int, default=1000)
+	parser.add_argument("-t", "--threads", required=False, help="Number of threads to run HattCI, [default=6]", type=int, default=1)	
+	parser.add_argument("-e", "--score", required=False, help="Threshold used to filter Infernal results [default=20]", type=int, default=20)
+	parser.add_argument("-r", "--orf", required=False, help="Threshold used to filter HattCI results [default=0]", type=int, default=0)
+	parser.add_argument("-a", "--adist", required=False, help="Max distance allowed to consider two adjacent attC sites part of the same integron [default=4000]", type=int, default=4000)	
+	parser.add_argument("-d", "--odist", required=False, help="Max distance allowed between ORF and attC site in the same gene cassette [default=500]", type=int, default=500)
 	
 	args = parser.parse_args()
 
-	return main(args.fasta, args.output, args.cmmodel, args.strand , args.seqs , args.threads , args.score , args.orf , args.adist , args.odist)
+	return main(fastafile=args.fasta, 
+				output_directory=args.output,
+				cm_model=args.cmmodel, 
+				both=args.strand, 
+				nseq=args.seqs, 
+				nthread=args.threads,
+				k_cm=args.score,
+				k_orf=args.orf,
+				dist_threshold=args.adist,
+				d_CDS_attC=args.odist)
 
 
 if __name__ == "__main__":
