@@ -33,7 +33,7 @@ import logging
 
 #---------------------------------------------------------------------------#
 # HattCI call
-def hattci(fastafile, output_directory, both=True, nseq=1000, nthread=6):
+def hattci(fastafile, output_directory, both, nseq, nthread):
 	# creating a dir for the hmm results
 	hmmer_results = os.path.join(output_directory, "hmmresults")
 	os.makedirs(hmmer_results, exist_ok=True)
@@ -58,11 +58,11 @@ def hattci(fastafile, output_directory, both=True, nseq=1000, nthread=6):
 		params.insert(1, "-b")
 	
 	out_f=open(output_file_log, "w")
-	try:
-		subprocess.run(params, stdout=out_f, shell=True, check=True)
-	except subprocess.CalledProcessError as err:
-		print(err)
-		sys.exit(1)
+	#try:
+	subprocess.run(params, stdout=out_f, shell=True, check=True)
+	#except subprocess.CalledProcessError as err:
+	#	print(err)
+	#	sys.exit(1)
 
 	#--------------#
 	# parsing file
@@ -968,7 +968,7 @@ def main(fastafile, output_directory, cm_model=None, both=True, nseq=1000, nthre
 		cm_model = (my_resources / 'selection109_oriR.cm')
 
 	# calling hattci
-	hattci_fasta = hattci(fastafile, output_directory, nseq= nseq, nthread = nthread)
+	hattci_fasta = hattci(fastafile, output_directory, nseq, nthread)
 	
 	logging.info("HattCI done!")
 
@@ -999,7 +999,7 @@ def migfinder_cli():
 	parser.add_argument("-c", "--cmmodel", required=False, help="Covariance model used by Infernal to validate the attC site secondary structure [default=None]")
 	parser.add_argument("-b", "--strand", required=False, help="Perform HattCI in both strands [default=True]", choices=[True, False], default=True)
 	parser.add_argument("-n", "--seqs", required=False, help="Number of sequences processed at a time by HattCI [default=1000]", type=int, default=1000)
-	parser.add_argument("-t", "--threads", required=False, help="Number of threads to run HattCI, [default=6]", type=int, default=1)	
+	parser.add_argument("-t", "--threads", required=False, help="Number of threads to run HattCI, [default=1]", type=int, default=1)	
 	parser.add_argument("-e", "--score", required=False, help="Threshold used to filter Infernal results [default=20]", type=int, default=20)
 	parser.add_argument("-r", "--orf", required=False, help="Threshold used to filter HattCI results [default=0]", type=int, default=0)
 	parser.add_argument("-a", "--adist", required=False, help="Max distance allowed to consider two adjacent attC sites part of the same integron [default=4000]", type=int, default=4000)	
