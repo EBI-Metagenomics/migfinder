@@ -55,13 +55,14 @@ def hattci(fastafile, output_directory, nseq, nthread):
 		fastafile,
 		output_file_tmp
 	]
-	
+
+	print(params)
 	out_f=open(output_file_log, "w")
-	#try:
-	subprocess.run(params, stdout=out_f, shell=True, check=True)
-	#except subprocess.CalledProcessError as err:
-	#	print(err)
-	#	sys.exit(1)
+	try:
+		subprocess.call(params, stdout=out_f, shell=True, check=True)
+	except subprocess.CalledProcessError as err:
+		print(err)
+		sys.exit(1)
 
 	#--------------#
 	# parsing file
