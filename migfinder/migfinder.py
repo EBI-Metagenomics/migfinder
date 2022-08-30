@@ -53,13 +53,13 @@ def hattci(fastafile, output_directory, nseq, nthread):
 		"-t",
 		str(nthread),
 		fastafile,
-		output_file_tmp
+		#output_file_tmp
 	]
 
 	print(params)
 	out_f=open(output_file_log, "w")
 	try:
-		subprocess.call(params, stdout=out_f, shell=True, check=True)
+		subprocess.run(params, stdout=out_f, shell=True, check=True)
 	except subprocess.CalledProcessError as err:
 		print(err)
 		sys.exit(1)
@@ -67,7 +67,8 @@ def hattci(fastafile, output_directory, nseq, nthread):
 	#--------------#
 	# parsing file
 	#--------------#
-	with open(output_file_tmp, "r") as file_in, open(output_file + ".hmm", "w") as file_out:
+	#with open(output_file_tmp, "r") as file_in, open(output_file + ".hmm", "w") as file_out:
+	with open('results.txt', "r") as file_in, open(output_file + ".hmm", "w") as file_out:
 		# extracting only table from the results
 		for line in file_in.readlines():
 			# removing first line with column names
@@ -82,8 +83,9 @@ def hattci(fastafile, output_directory, nseq, nthread):
 	# TODO: it is possible that outHattCI.fasta will be written in the base dir
 	shutil.copy(f"outHattCI.fasta", f"{output_file}_hattci.fasta")
 	
-	return f"{output_file}_hattci.fasta"
-
+	#return f"{output_file}_hattci.fasta"
+	return f"outHattCI.fasta"
+	
 #---------------------------------------------------------------------------#
 
 
