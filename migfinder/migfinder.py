@@ -953,7 +953,7 @@ def posproc2(prefix, output_directory, k_orf, d_CDS_attC = 500, dist_threshold=4
 
 
 #---------------------------------------------------------------------------#
-def main(fastafile, output_directory, cm_model=None, both=True, nseq=1000, nthread=6, k_cm=20, k_orf=0, dist_threshold=4000, d_CDS_attC=500):
+def main(fastafile, output_directory, cm_model=None, both=True, nseq=1000, nthread=1, k_cm=20, k_orf=0, dist_threshold=4000, d_CDS_attC=500):
 	# creating outfile name
 	basename = os.path.basename(fastafile)	
 	prefix=os.path.splitext(basename)[0]
@@ -968,7 +968,7 @@ def main(fastafile, output_directory, cm_model=None, both=True, nseq=1000, nthre
 		cm_model = (my_resources / 'selection109_oriR.cm')
 
 	# calling hattci
-	hattci_fasta = hattci(fastafile, output_directory, nseq, nthread)
+	hattci_fasta = hattci(fastafile, output_directory, nseq=nseq, nthread=nthread)
 	
 	logging.info("HattCI done!")
 
