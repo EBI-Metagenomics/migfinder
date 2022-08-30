@@ -33,7 +33,7 @@ import logging
 
 #---------------------------------------------------------------------------#
 # HattCI call
-def hattci(fastafile, output_directory, both, nseq, nthread):
+def hattci(fastafile, output_directory, nseq, nthread):
 	# creating a dir for the hmm results
 	hmmer_results = os.path.join(output_directory, "hmmresults")
 	os.makedirs(hmmer_results, exist_ok=True)
@@ -47,6 +47,7 @@ def hattci(fastafile, output_directory, both, nseq, nthread):
 	# calling hattci, both strands or not?
 	params = [
 		"hattci.out",
+		"-b",
 		"-s",
 		str(nseq),
 		"-t",
@@ -54,8 +55,6 @@ def hattci(fastafile, output_directory, both, nseq, nthread):
 		fastafile,
 		output_file_tmp
 	]
-	if both:
-		params.insert(1, "-b")
 	
 	out_f=open(output_file_log, "w")
 	#try:
